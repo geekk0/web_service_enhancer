@@ -5,7 +5,7 @@ from photoshop.api.enumerations import DialogModes
 from photoshop.api import JPEGSaveOptions
 
 
-def process_folder(folder: str):
+async def process_folder(folder: str):
     action = identify_action(folder)
 
     if not action:
@@ -45,8 +45,3 @@ def identify_action(folder):
     for studio_action in studio_actions.keys():
         if studio_action in folder:
             return studio_actions[studio_action]
-
-
-# folder_path = r"C:\Users\Gekk0\Pictures\Camera Roll"
-# execution_time = process_folder(folder_path)
-# print(f"Total execution time: {execution_time:.2f} seconds")
