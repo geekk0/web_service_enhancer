@@ -6,12 +6,15 @@ from photoshop.api import JPEGSaveOptions
 
 
 async def process_folder(folder: str):
+    open_save_time = 0
+    enhance_time = 0
+
     action = identify_action(folder)
 
     if not action:
         return
 
-    image_files = [f for f in os.listdir(folder) if f.endswith('.jpg')]
+    image_files = [f for f in os.listdir(folder) if f.lower().endswith('.jpg')]
     start_time = time.time()
 
     try:
@@ -19,19 +22,33 @@ async def process_folder(folder: str):
             ps.app.displayDialogs = DialogModes.DisplayNoDialogs
 
             for image_name in image_files:
+                print(f"Processing image: {image_name}")
                 image_path = os.path.join(folder, image_name)
+
+                open_save_start_time = time.time()
                 doc = ps.app.open(image_path)
-                ps.app.doAction(action, "Default Actions")
                 options = JPEGSaveOptions(quality=5)
                 doc.saveAs(image_path, options, asCopy=False)
                 doc.close()
+                open_save_end_time = time.time()
+
+                open_save_time += open_save_end_time - open_save_start_time
+
+                enhance_start_time = time.time()
+                doc = ps.app.open(image_path)
+                ps.app.doAction(action, "Default Actions")
+                doc.saveAs(image_path, options, asCopy=False)
+                doc.close()
+                enhance_end_time = time.time()
+
+                enhance_time += enhance_end_time - enhance_start_time
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
     end_time = time.time()
     total_time = end_time - start_time
-    return total_time
+    return total_time, open_save_time, enhance_time
 
 
 def identify_action(folder):
@@ -39,7 +56,7 @@ def identify_action(folder):
         'Силуэт': 'silhouette_action',
         'Отражение': 'reflect_action',
         'Портрет': 'portrait_action',
-        'KZ': 'kz_action'
+        'KZ': 'kz_action',
     }
 
     for studio_action in studio_actions.keys():
