@@ -1,18 +1,14 @@
 import os
 import time
+
 from photoshop import Session
 from photoshop.api.enumerations import DialogModes
 from photoshop.api import JPEGSaveOptions
 
 
-async def process_folder(folder: str):
+async def process_folder(folder: str, action: str):
     open_save_time = 0
     enhance_time = 0
-
-    action = identify_action(folder)
-
-    if not action:
-        return
 
     image_files = [f for f in os.listdir(folder) if f.lower().endswith('.jpg')]
     start_time = time.time()
