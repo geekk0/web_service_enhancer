@@ -1,10 +1,14 @@
 import os
 
 from fastapi import FastAPI
-from schemas import EnhanceFolderRequestData
 from photoshop_enhancer import process_folder
+from schemas import EnhanceFolderRequestData
+from middleware import validate_ip
+
 
 app = FastAPI()
+
+app.middleware("http")(validate_ip)
 
 
 @app.get("/")
