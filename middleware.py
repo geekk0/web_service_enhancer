@@ -1,6 +1,7 @@
+import configparser
+
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
-import configparser
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -19,3 +20,5 @@ async def validate_ip(request: Request, call_next):
 
     # Proceed if IP is allowed
     return await call_next(request)
+
+
