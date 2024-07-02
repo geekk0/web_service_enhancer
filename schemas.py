@@ -13,7 +13,7 @@ class EnhanceFolderRequestData(BaseModel):
 class ProcessFolderResult(BaseModel):
     status: str
     message: str | None = None
-    execution_time: str | None = None
+    execution_time: int | None = None
     error: bool = False
     error_type: str | None = None
     error_message: str | None = None
