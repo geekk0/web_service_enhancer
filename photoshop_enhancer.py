@@ -1,3 +1,4 @@
+import configparser
 import os
 import time
 
@@ -6,9 +7,21 @@ from photoshop.api.enumerations import DialogModes
 from photoshop.api import JPEGSaveOptions
 from schemas import ProcessFolderResult
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 
 async def process_folder(folder: str, action: str) -> ProcessFolderResult:
+
     start_time = time.time()
+
+    shared_folder = config['NETWORK_SETTINGS']['ROOT_FOLDER']
+    if not check_shared_folder(shared_folder):
+        return ProcessFolderResult(status="failed",
+                                   error=True,
+                                   error_type="FileNotFoundError",
+                                   error_message=f"Shared folder {shared_folder} is unavailable")
+
     try:
         image_files = [f for f in os.listdir(folder) if f.lower().endswith('.jpg')]
     except FileNotFoundError:
@@ -54,3 +67,6 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
     return result
 
 
+def check_shared_folder(shared_folder):
+    if os.path.exists(shared_folder):
+        return True
