@@ -13,10 +13,10 @@ class EnhanceFolderRequestData(BaseModel):
 class ProcessFolderResult(BaseModel):
     status: str
     message: str | None = None
-    execution_time: int | None = None
+    execution_time: float | None = None
     error: bool = False
     error_type: str | None = None
     error_message: str | None = None
 
-    def json(self):
+    def json(self, **kwargs):
         return jsonable_encoder(self)
