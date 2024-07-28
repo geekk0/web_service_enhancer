@@ -32,12 +32,13 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
                                    error_type="FileNotFoundError",
                                    error_message=f"Folder {folder} not found")
 
-    destination_path = f'{folder}_RS'
+    destination_path = f'{folder}_AI'
 
-    try:
-        os.mkdir(destination_path)
-    except FileExistsError:
-        return ProcessFolderResult(status="failed",
+    if not os.path.exists(destination_path):
+        try:
+            os.mkdir(destination_path)
+        except FileExistsError:
+            return ProcessFolderResult(status="failed",
                                    error=True,
                                    error_type="FileExistsError",
                                    error_message=f"Folder {destination_path} already exists")
@@ -46,23 +47,26 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
         with Session() as ps:
             ps.app.displayDialogs = DialogModes.DisplayNoDialogs
 
+            print(f'Processing folder: {destination_path}')
+
             for image_name in image_files:
-                selected_action = action
-                print(f"Processing image: {image_name}")
-                image_path = os.path.join(folder, image_name)
-                source_image_path = os.path.join(folder, image_name)
-                destination_image_path = os.path.join(destination_path, image_name)
+                if not os.path.isfile(os.path.join(destination_path, image_name)):
+                    selected_action = action
+                    print(f"Processing image: {image_name}")
+                    image_path = os.path.join(folder, image_name)
+                    source_image_path = os.path.join(folder, image_name)
+                    destination_image_path = os.path.join(destination_path, image_name)
 
-                if is_black_white(source_image_path):
-                    selected_action = f'{action}_bw'
+                    if is_black_white(source_image_path):
+                        selected_action = f'{action}_bw'
 
-                print(selected_action)
+                    print(selected_action)
 
-                doc = ps.app.open(image_path)
-                ps.app.doAction(selected_action, "reflect_studio")
-                options = JPEGSaveOptions(quality=12)
-                doc.saveAs(destination_image_path, options, asCopy=False)
-                doc.close()
+                    doc = ps.app.open(image_path)
+                    ps.app.doAction(selected_action, "reflect_studio")
+                    options = JPEGSaveOptions(quality=12)
+                    doc.saveAs(destination_image_path, options, asCopy=False)
+                    doc.close()
 
 
     except Exception as e:
