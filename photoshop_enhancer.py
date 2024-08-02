@@ -70,7 +70,7 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
 
 
     except Exception as e:
-        return ProcessFolderResult(status = "failed",
+        return ProcessFolderResult(status='failed',
                                    error=True,
                                    error_message=e)
 
