@@ -68,14 +68,15 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
                     doc.saveAs(destination_image_path, options, asCopy=False)
                     doc.close()
 
-
     except Exception as e:
-        return ProcessFolderResult(error=True, error_message=e)
+        return ProcessFolderResult(status='failed',
+                                   error=True,
+                                   error_message=e)
 
     end_time = time.time()
     execution_time = end_time - start_time
-    result = ProcessFolderResult(message="Folder processed successfully",
-                                 status="success",
+    result = ProcessFolderResult(status="success",
+                                 message="Folder processed successfully",
                                  execution_time=execution_time)
     return result
 
