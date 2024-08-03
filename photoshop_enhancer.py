@@ -72,7 +72,7 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
     except Exception as e:
         return ProcessFolderResult(status='failed',
                                    error=True,
-                                   error_message=e)
+                                   error_message=str(e))
 
     end_time = time.time()
     execution_time = end_time - start_time
