@@ -8,6 +8,7 @@ from photoshop.api import JPEGSaveOptions
 from PIL import Image
 
 from schemas import ProcessFolderResult
+from tg_bot_messages import send_folder_enhanced_message
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -87,6 +88,7 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
                                      status="success",
                                      error=False,
                                      execution_time=execution_time)
+        notify_folder_processed(folder)
     else:
         result = ProcessFolderResult(message="Error occurred while processing folder",
                                      status="failed",
@@ -110,3 +112,7 @@ def is_black_white(image_path):
 def check_shared_folder(shared_folder):
     if os.path.exists(shared_folder):
         return True
+
+
+def notify_folder_processed(folder_path):
+    send_folder_enhanced_message(folder_path)
