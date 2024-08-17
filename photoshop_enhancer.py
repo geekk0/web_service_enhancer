@@ -17,6 +17,8 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
 
     start_time = time.time()
 
+    enhance_error = False
+
     shared_folder = config['NETWORK_SETTINGS']['ROOT_FOLDER']
     if not check_shared_folder(shared_folder):
         return ProcessFolderResult(status="failed",
@@ -51,23 +53,27 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
 
             for image_name in image_files:
                 if not os.path.isfile(os.path.join(destination_path, image_name)):
-                    selected_action = action
-                    print(f"Processing image: {image_name}")
-                    image_path = os.path.join(folder, image_name)
-                    source_image_path = os.path.join(folder, image_name)
-                    destination_image_path = os.path.join(destination_path, image_name)
+                    try:
+                        selected_action = action
+                        print(f"Processing image: {image_name}")
+                        image_path = os.path.join(folder, image_name)
+                        source_image_path = os.path.join(folder, image_name)
+                        destination_image_path = os.path.join(destination_path, image_name)
 
-                    if is_black_white(source_image_path):
-                        selected_action = f'{action}_bw'
+                        if is_black_white(source_image_path):
+                            selected_action = f'{action}_bw'
 
-                    print(selected_action)
+                        print(selected_action)
 
-                    doc = ps.app.open(image_path)
-                    ps.app.doAction(selected_action, "reflect_studio")
-                    options = JPEGSaveOptions(quality=12)
-                    doc.saveAs(destination_image_path, options, asCopy=False)
-                    doc.close()
-
+                        doc = ps.app.open(image_path)
+                        ps.app.doAction(selected_action, "reflect_studio")
+                        options = JPEGSaveOptions(quality=12)
+                        doc.saveAs(destination_image_path, options, asCopy=False)
+                        doc.close()
+                    except Exception as e:
+                        print(e)
+                        enhance_error = True
+                    time.sleep(0.5)
 
     except Exception as e:
         return ProcessFolderResult(status='failed',
@@ -76,10 +82,15 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
 
     end_time = time.time()
     execution_time = end_time - start_time
-    result = ProcessFolderResult(message="Folder processed successfully",
-                                 status="success",
-                                 error=False,
-                                 execution_time=execution_time)
+    if not enhance_error:
+        result = ProcessFolderResult(message="Folder processed successfully",
+                                     status="success",
+                                     error=False,
+                                     execution_time=execution_time)
+    else:
+        result = ProcessFolderResult(message="Error occurred while processing folder",
+                                     status="failed",
+                                     error=True)
     return result
 
 
