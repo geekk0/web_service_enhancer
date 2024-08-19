@@ -14,7 +14,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 
-async def process_folder(folder: str, action: str) -> ProcessFolderResult:
+async def process_folder(folder: str, action: str, attempt_counter: int = 1) -> ProcessFolderResult:
 
     start_time = time.time()
 
@@ -85,18 +85,35 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
                                    error=True,
                                    error_message=str(e))
 
-    end_time = time.time()
-    execution_time = end_time - start_time
-    if not enhance_error:
+
+    # if not enhance_error:
+    #     result = ProcessFolderResult(message="Folder processed successfully",
+    #                                  status="success",
+    #                                  error=False,
+    #                                  execution_time=execution_time)
+    #     notify_folder_processed(folder)
+    # else:
+    #     result = ProcessFolderResult(message="Error occurred while processing folder",
+    #                                  status="failed",
+    #                                  error=True)
+
+    if enhance_error:
+        if attempt_counter < 3:
+            attempt_counter += 1
+            return await process_folder(folder, action, attempt_counter)
+        else:
+            result = ProcessFolderResult(status="failed",
+                                         error=True,
+                                         error_type="enhance_error",
+                                         error_message="Error occurred while processing folder")
+    else:
+        end_time = time.time()
+        execution_time = end_time - start_time
         result = ProcessFolderResult(message="Folder processed successfully",
                                      status="success",
                                      error=False,
                                      execution_time=execution_time)
-        notify_folder_processed(folder)
-    else:
-        result = ProcessFolderResult(message="Error occurred while processing folder",
-                                     status="failed",
-                                     error=True)
+
     return result
 
 
