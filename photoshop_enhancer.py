@@ -69,7 +69,11 @@ async def process_folder(folder: str, action: str) -> ProcessFolderResult:
                         doc = ps.app.open(image_path)
                         ps.app.doAction(selected_action, "reflect_studio")
                         options = JPEGSaveOptions(quality=12)
-                        doc.saveAs(destination_image_path, options, asCopy=False)
+                        try:
+                            doc.saveAs(destination_image_path, options, asCopy=False)
+                        except Exception as e:
+                            print(e)
+                            enhance_error = True
                         doc.close()
                     except Exception as e:
                         print(e)
