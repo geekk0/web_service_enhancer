@@ -8,6 +8,8 @@ class EnhanceFolderRequestData(BaseModel):
     month: str
     day: str
     hour: str
+    task: bool
+    cert_code: str | None = None
 
 
 class ProcessFolderResult(BaseModel):
@@ -17,6 +19,7 @@ class ProcessFolderResult(BaseModel):
     error: bool = False
     error_type: str | None = None
     error_message: str | None = None
+    folder_name: str | None = None
 
     def json(self, **kwargs):
         return jsonable_encoder(self)

@@ -1,8 +1,8 @@
 :: Install FastAPI and Uvicorn
 pip install fastapi
 pip install uvicorn
-pip install pillow
-pip install aiogram
+pip install pillow==10.4.0
+pip install pyTelegramBotAPI
 
 :: Change directory to the folder containing main.py
 ::cd C:\Users\Gekk0\PycharmProjects\web_service_enhancer\web_service_enhancer
